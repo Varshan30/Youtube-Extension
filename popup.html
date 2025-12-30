@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Study Mode</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0a0a14 0%, #12121f 40%, #1a1a2e 70%, #0f1928 100%);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.06);
+      --accent-cyan: #00d4ff;
+      --accent-green: #00ff88;
+      --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --danger: #ff4757;
+    }
+
+    body {
+      width: 380px;
+      min-height: 500px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 300px; height: 300px;
+      background: var(--accent-cyan);
+      top: -100px; right: -100px;
+      animation: float 8s ease-in-out infinite;
+    }
+    body::after {
+      width: 250px; height: 250px;
+      background: var(--accent-green);
+      bottom: -80px; left: -80px;
+      animation: float 10s ease-in-out infinite reverse;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(20px, 15px) scale(1.05); }
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+    }
+    .glass-strong {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+    }
+
+    .header {
+      padding: 24px 20px 20px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+    .logo-icon {
+      width: 48px; height: 48px;
+      background: var(--accent-gradient);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 8px 24px rgba(0, 212, 255, 0.25);
+      animation: glow 3s ease-in-out infinite;
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 8px 24px rgba(0, 212, 255, 0.25); }
+      50% { box-shadow: 0 8px 32px rgba(0, 212, 255, 0.4), 0 0 48px rgba(0, 255, 136, 0.2); }
+    }
+    .logo-text h1 {
+      font-size: 22px;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .logo-text .tagline {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .main {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Toggle Card */
+    .toggle-card {
+      padding: 20px;
+      transition: all 0.4s;
+      position: relative;
+    }
+    .toggle-card.active {
+      background: rgba(0, 212, 255, 0.05);
+      border-color: rgba(0, 212, 255, 0.2);
+    }
+    .toggle-card.active::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent-gradient);
+      border-radius: 20px 20px 0 0;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .toggle-info h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .toggle-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      width: 64px; height: 34px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 34px;
+      transition: all 0.4s;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    .toggle-thumb {
+      position: absolute;
+      top: 4px; left: 4px;
+      width: 26px; height: 26px;
+      background: linear-gradient(135deg, #fff, #e0e0e0);
+      border-radius: 50%;
+      transition: all 0.4s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--accent-gradient);
+      border-color: transparent;
+      box-shadow: 0 0 24px rgba(0, 212, 255, 0.4);
+    }
+    .toggle-switch input:checked + .toggle-track .toggle-thumb {
+      transform: translateX(30px);
+    }
+
+    /* Status Badge */
+    .status-badge {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.4s;
+    }
+    .status-badge.off {
+      background: rgba(255, 71, 87, 0.1);
+      border: 1px solid rgba(255, 71, 87, 0.2);
+      color: var(--danger);
+    }
+    .status-badge.on {
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      color: var(--accent-green);
+    }
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    .status-badge.off .status-dot { background: var(--danger); }
+    .status-badge.on .status-dot {
+      background: var(--accent-green);
+      box-shadow: 0 0 12px var(--accent-green);
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.9); }
+    }
+
+    /* Section Title */
+    .section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      padding-left: 4px;
+      font-weight: 600;
+    }
+
+    /* Filter Mode - Only Blur and Hide */
+    .filter-section { padding: 16px; }
+    .filter-modes {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .filter-mode-btn {
+      padding: 18px 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 2px solid var(--glass-border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-secondary);
+    }
+    .filter-mode-btn:hover {
+      background: var(--glass-hover);
+      border-color: rgba(0, 212, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    .filter-mode-btn.active {
+      background: rgba(0, 212, 255, 0.1);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+    }
+    .filter-mode-btn .icon { font-size: 32px; }
+    .filter-mode-btn .label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .filter-mode-btn .desc {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Blocking Section */
+    .blocking-section { padding: 16px; }
+    .blocking-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .blocking-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .blocking-option:hover {
+      background: var(--glass-hover);
+      border-color: var(--glass-border);
+    }
+    .blocking-option-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .blocking-option-info .icon {
+      font-size: 16px;
+      width: 30px; height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+    .blocking-option-info .text {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* Mini Toggle */
+    .mini-toggle {
+      position: relative;
+      width: 42px; height: 22px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .mini-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .mini-toggle .track {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 22px;
+      transition: all 0.3s;
+    }
+    .mini-toggle .thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 16px; height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      transition: all 0.3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .mini-toggle input:checked + .track {
+      background: var(--accent-gradient);
+      box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+    }
+    .mini-toggle input:checked + .track .thumb {
+      transform: translateX(20px);
+    }
+
+    /* Stats */
+    .stats-section {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .stat-card {
+      padding: 16px 8px;
+      text-align: center;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 2px;
+      background: var(--accent-gradient);
+      opacity: 0.5;
+      border-radius: 2px;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 6px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* Actions */
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .btn {
+      padding: 14px 16px;
+      border: none;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-danger {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: rgba(255, 71, 87, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
+    }
+    .btn-secondary {
+      background: var(--glass-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--glass-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    /* Footer */
+    .footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+    }
+    .footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .footer a:hover { opacity: 0.8; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(0, 255, 136, 0.15);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: var(--accent-green);
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error {
+      background: rgba(255, 71, 87, 0.15);
+      border-color: rgba(255, 71, 87, 0.3);
+      color: var(--danger);
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container">
+      <div class="logo-icon">📚</div>
+      <div class="logo-text">
+        <h1>Study Mode</h1>
+        <p class="tagline">Focus on what matters</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Main Toggle -->
+    <div class="toggle-card glass-strong" id="toggleCard">
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <h3>Enable Study Mode</h3>
+          <p>Filter non-educational content</p>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleStudy">
+          <div class="toggle-track">
+            <div class="toggle-thumb"></div>
+          </div>
+        </label>
+      </div>
+      <div class="status-badge off" id="statusBadge">
+        <span class="status-dot"></span>
+        <span id="statusText">Study Mode is OFF</span>
+      </div>
+    </div>
+
+    <!-- Filter Mode -->
+    <div class="filter-section glass">
+      <div class="section-title">Filter Style</div>
+      <div class="filter-modes">
+        <button class="filter-mode-btn active" data-mode="blur">
+          <span class="icon">🌫️</span>
+          <span class="label">Blur</span>
+          <span class="desc">Blur distracting videos</span>
+        </button>
+        <button class="filter-mode-btn" data-mode="hide">
+          <span class="icon">👁️‍🗨️</span>
+          <span class="label">Hide</span>
+          <span class="desc">Completely hide</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Block Areas -->
+    <div class="blocking-section glass">
+      <div class="section-title">Block Content In</div>
+      <div class="blocking-grid">
+        <div class="blocking-option">
+          <div class="blocking-option-info">
+            <span class="icon">🏠</span>
+            <span class="text">Home</span>
+          </div>
+          <label class="mini-toggle">
+            <input type="checkbox" id="blockHome" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="blocking-option">
+          <div class="blocking-option-info">
+            <span class="icon">🔍</span>
+            <span class="text">Search</span>
+          </div>
+          <label class="mini-toggle">
+            <input type="checkbox" id="blockSearch" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="blocking-option">
+          <div class="blocking-option-info">
+            <span class="icon">📺</span>
+            <span class="text">Sidebar</span>
+          </div>
+          <label class="mini-toggle">
+            <input type="checkbox" id="blockSidebar" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="blocking-option">
+          <div class="blocking-option-info">
+            <span class="icon">🎬</span>
+            <span class="text">Shorts</span>
+          </div>
+          <label class="mini-toggle">
+            <input type="checkbox" id="blockShorts" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="blocking-option">
+          <div class="blocking-option-info">
+            <span class="icon">📈</span>
+            <span class="text">Trending</span>
+          </div>
+          <label class="mini-toggle">
+            <input type="checkbox" id="blockTrending" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="blocking-option">
+          <div class="blocking-option-info">
+            <span class="icon">🎯</span>
+            <span class="text">End Screen</span>
+          </div>
+          <label class="mini-toggle">
+            <input type="checkbox" id="blockEndscreen" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-section">
+      <div class="stat-card glass">
+        <div class="stat-value" id="filteredCount">0</div>
+        <div class="stat-label">Filtered</div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-value" id="allowedCount">0</div>
+        <div class="stat-label">Allowed</div>
+      </div>
+      <div class="stat-card glass">
+        <div class="stat-value" id="totalCount">0</div>
+        <div class="stat-label">Scanned</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-danger" id="restoreBtn">🔄 Restore All</button>
+      <button class="btn btn-secondary" id="settingsBtn">⚙️ Settings</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>v1.0.0</span>
+    <a href="#" id="helpLink">Need help?</a>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toastIcon">✓</span>
+    <span id="toastText">Settings saved</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

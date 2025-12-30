@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Study Mode - Settings</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0a0a14 0%, #12121f 40%, #1a1a2e 70%, #0f1928 100%);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.06);
+      --accent-cyan: #00d4ff;
+      --accent-green: #00ff88;
+      --accent-gradient: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --danger: #ff4757;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-primary);
+      padding: 40px 20px;
+    }
+
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: var(--accent-cyan);
+      top: -200px; right: -200px;
+      animation: float 12s ease-in-out infinite;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: var(--accent-green);
+      bottom: -150px; left: -150px;
+      animation: float 15s ease-in-out infinite reverse;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, 20px) scale(1.1); }
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .header-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-icon {
+      width: 60px; height: 60px;
+      background: var(--accent-gradient);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      box-shadow: 0 12px 40px rgba(0, 212, 255, 0.3);
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header p {
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-size: 14px;
+    }
+
+    /* Sections */
+    .section {
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-cyan);
+      margin-bottom: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--glass-border);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-item {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      border: 1px solid var(--glass-border);
+    }
+    .stat-item .value {
+      font-size: 32px;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-item .label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    /* Textarea */
+    .input-group { margin-bottom: 20px; }
+    .input-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Inter', monospace;
+      resize: vertical;
+      line-height: 1.6;
+      transition: all 0.3s;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+      background: rgba(0, 0, 0, 0.4);
+    }
+    textarea::placeholder { color: var(--text-muted); }
+    .input-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Block Areas Grid */
+    .block-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .block-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 14px;
+      border: 1px solid var(--glass-border);
+      transition: all 0.2s;
+    }
+    .block-item:hover {
+      background: rgba(0, 0, 0, 0.3);
+      border-color: rgba(0, 212, 255, 0.2);
+    }
+    .block-item-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .block-item-info .icon {
+      font-size: 20px;
+      width: 36px; height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+    .block-item-info .text {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Toggle */
+    .toggle {
+      position: relative;
+      width: 48px; height: 26px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle .track {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 26px;
+      transition: all 0.3s;
+    }
+    .toggle .thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 20px; height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: all 0.3s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .toggle input:checked + .track {
+      background: var(--accent-gradient);
+      box-shadow: 0 0 16px rgba(0, 212, 255, 0.4);
+    }
+    .toggle input:checked + .track .thumb {
+      transform: translateX(22px);
+    }
+
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 14px 24px;
+      border: none;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn-primary {
+      background: var(--accent-gradient);
+      color: #000;
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+    }
+    .btn-secondary {
+      background: var(--glass-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+    }
+    .btn-secondary:hover {
+      background: var(--glass-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .btn-danger {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+    }
+    .btn-danger:hover {
+      background: rgba(255, 71, 87, 0.25);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(0, 255, 136, 0.15);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: var(--accent-green);
+      padding: 16px 24px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast.error {
+      background: rgba(255, 71, 87, 0.15);
+      border-color: rgba(255, 71, 87, 0.3);
+      color: var(--danger);
+    }
+
+    /* Hidden file input */
+    #importFile { display: none; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .block-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .block-grid { grid-template-columns: 1fr; }
+      .btn-group { flex-direction: column; }
+      .btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <div class="logo-icon">📚</div>
+        <div>
+          <h1>Study Mode Settings</h1>
+          <p>Customize your distraction-free YouTube experience</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="section glass">
+      <div class="section-title">📊 Statistics</div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="value" id="totalFiltered">0</div>
+          <div class="label">Total Filtered</div>
+        </div>
+        <div class="stat-item">
+          <div class="value" id="totalAllowed">0</div>
+          <div class="label">Total Allowed</div>
+        </div>
+        <div class="stat-item">
+          <div class="value" id="keywordCount">0</div>
+          <div class="label">Keywords</div>
+        </div>
+        <div class="stat-item">
+          <div class="value" id="channelCount">0</div>
+          <div class="label">Channels</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Keywords Section -->
+    <div class="section glass">
+      <div class="section-title">🔑 Educational Keywords</div>
+      <div class="input-group">
+        <label class="input-label">Videos with these keywords will be allowed</label>
+        <textarea id="keywords" placeholder="Enter keywords, one per line&#10;e.g.,&#10;tutorial&#10;lecture&#10;course&#10;programming"></textarea>
+        <p class="input-hint">💡 Add keywords that match educational content you want to see</p>
+      </div>
+    </div>
+
+    <!-- Channels Section -->
+    <div class="section glass">
+      <div class="section-title">📺 Whitelisted Channels</div>
+      <div class="input-group">
+        <label class="input-label">Videos from these channels will always be allowed</label>
+        <textarea id="channels" placeholder="Enter channel names, one per line&#10;e.g.,&#10;3Blue1Brown&#10;Veritasium&#10;Khan Academy"></textarea>
+        <p class="input-hint">💡 Add your favorite educational channels</p>
+      </div>
+    </div>
+
+    <!-- Block Areas Section -->
+    <div class="section glass">
+      <div class="section-title">🚫 Block Content In</div>
+      <div class="block-grid">
+        <div class="block-item">
+          <div class="block-item-info">
+            <span class="icon">🏠</span>
+            <span class="text">Home Page</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="blockHome" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="block-item">
+          <div class="block-item-info">
+            <span class="icon">🔍</span>
+            <span class="text">Search Results</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="blockSearch" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="block-item">
+          <div class="block-item-info">
+            <span class="icon">📺</span>
+            <span class="text">Sidebar</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="blockSidebar" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="block-item">
+          <div class="block-item-info">
+            <span class="icon">🎬</span>
+            <span class="text">Shorts</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="blockShorts" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="block-item">
+          <div class="block-item-info">
+            <span class="icon">📈</span>
+            <span class="text">Trending</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="blockTrending" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+        <div class="block-item">
+          <div class="block-item-info">
+            <span class="icon">🎯</span>
+            <span class="text">End Screen</span>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="blockEndscreen" checked>
+            <div class="track"><div class="thumb"></div></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions Section -->
+    <div class="section glass">
+      <div class="section-title">⚡ Actions</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" id="saveBtn">💾 Save Settings</button>
+        <button class="btn btn-secondary" id="exportBtn">📤 Export</button>
+        <button class="btn btn-secondary" id="importBtn">📥 Import</button>
+        <button class="btn btn-danger" id="resetBtn">🗑️ Reset Allowed</button>
+      </div>
+      <input type="file" id="importFile" accept=".json">
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toastIcon">✓</span>
+    <span id="toastText">Settings saved</span>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

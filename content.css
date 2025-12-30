@@ -1,0 +1,280 @@
+/* styles for injected UI and hiding placeholders */
+.ytm-study-hidden-placeholder{
+display: flex !important;
+align-items: center;
+justify-content: center;
+min-height: 120px;
+color: #888;
+background: rgba(240,240,240,0.02);
+border-radius: 8px;
+font-size: 13px;
+padding: 12px;
+}
+
+
+.ytm-study-badge{
+background: #ffeb3b;
+color: #000;
+padding: 2px 6px;
+border-radius: 4px;
+font-size: 11px;
+margin-left: 6px;
+}
+
+
+.ytm-study-overlay {
+position: fixed;
+right: 12px;
+bottom: 12px;
+background: rgba(0,0,0,0.7);
+color: #fff;
+padding: 8px 10px;
+border-radius: 8px;
+font-size: 13px;
+z-index: 9999999;
+}
+
+
+/* small button style for card allow */
+.ytm-allow-btn{
+background: transparent;
+border: 1px solid rgba(255,255,255,0.08);
+color: var(--yt-spec-text-primary);
+padding: 4px 8px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 12px;
+}
+
+/* YouTube Study Mode - Content Styles */
+
+/* These styles complement the injected styles from content-script.js */
+
+/* Smooth transitions for all filtered videos */
+ytd-rich-item-renderer,
+ytd-video-renderer,
+ytd-compact-video-renderer,
+ytd-grid-video-renderer {
+  transition: all 0.3s ease !important;
+}
+
+/* Ensure overlays work correctly */
+ytd-rich-item-renderer,
+ytd-video-renderer,
+ytd-compact-video-renderer,
+ytd-grid-video-renderer {
+  position: relative !important;
+}
+
+/* Hide YouTube's built-in recommendations when in strict mode */
+.yt-study-strict-mode ytd-watch-next-secondary-results-renderer {
+  opacity: 0.3 !important;
+  filter: blur(5px) !important;
+}
+
+/* Style for the status badge */
+.yt-study-badge {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #00d4ff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 9999;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.yt-study-badge::before {
+  content: "📚";
+}
+
+.yt-study-badge.active {
+  background: linear-gradient(135deg, #0a2a1a 0%, #0f3d2a 100%);
+  border-color: rgba(0, 255, 136, 0.3);
+  color: #00ff88;
+}
+
+/* YouTube Study Mode - Fallback Styles */
+/* Main styles are injected via content-script.js for better control */
+
+/* Ensure video containers have position for overlay */
+ytd-rich-item-renderer,
+ytd-video-renderer,
+ytd-compact-video-renderer,
+ytd-grid-video-renderer,
+ytd-reel-item-renderer {
+  position: relative !important;
+}
+
+/* Hide YouTube's distracting elements when study mode is active */
+body.yt-study-active ytd-masthead #buttons ytd-notification-topbar-button-renderer {
+  opacity: 0.3;
+}
+
+/* Focus mode - dim non-video elements */
+body.yt-study-focus #secondary {
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+body.yt-study-focus #secondary:hover {
+  opacity: 1;
+}
+
+.yt-study-blur {
+  filter: blur(20px) grayscale(80%) !important;
+  transition: filter 0.3s ease !important;
+}
+.yt-study-blur:hover {
+  filter: blur(8px) grayscale(50%) !important;
+}
+
+.yt-study-hide {
+  opacity: 0.03 !important;
+  transition: opacity 0.3s ease !important;
+}
+.yt-study-hide:hover {
+  opacity: 0.15 !important;
+}
+
+.yt-study-allowed {
+  filter: none !important;
+  opacity: 1 !important;
+}
+.yt-study-allowed::before {
+  content: '✓ Study';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(135deg, #00d4ff, #00ff88);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 12px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.yt-study-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: blur(8px) !important;
+  z-index: 50 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s ease !important;
+  border-radius: 12px !important;
+}
+
+.yt-study-blur:hover .yt-study-overlay,
+.yt-study-hide:hover .yt-study-overlay {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.yt-study-overlay-content {
+  text-align: center !important;
+  padding: 20px !important;
+  color: #fff !important;
+}
+
+.yt-study-overlay-icon {
+  font-size: 32px !important;
+  margin-bottom: 8px !important;
+}
+
+.yt-study-overlay-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #ff6b6b !important;
+}
+
+.yt-study-overlay-subtitle {
+  font-size: 11px !important;
+  color: rgba(255,255,255,0.6) !important;
+  margin: 4px 0 12px !important;
+  max-width: 150px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.yt-study-overlay-actions {
+  display: flex !important;
+  gap: 8px !important;
+  justify-content: center !important;
+}
+
+.yt-study-btn {
+  padding: 8px 14px !important;
+  border: none !important;
+  border-radius: 16px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.yt-study-allow {
+  background: linear-gradient(135deg, #00d4ff, #00a8cc) !important;
+  color: #000 !important;
+}
+.yt-study-allow:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4) !important;
+}
+
+.yt-study-peek {
+  background: rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+}
+.yt-study-peek:hover {
+  background: rgba(255,255,255,0.2) !important;
+}
+
+#yt-study-badge {
+  position: fixed !important;
+  top: 70px !important;
+  right: 20px !important;
+  background: linear-gradient(135deg, rgba(10, 20, 40, 0.95), rgba(20, 40, 60, 0.95)) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(0, 212, 255, 0.3) !important;
+  border-radius: 30px !important;
+  padding: 10px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  z-index: 99999 !important;
+  font-size: 12px !important;
+  color: #00d4ff !important;
+  font-weight: 600 !important;
+  transform: translateX(150%) !important;
+  transition: transform 0.4s ease !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+#yt-study-badge.visible {
+  transform: translateX(0) !important;
+}
+
+.yt-study-badge-count {
+  background: rgba(0, 212, 255, 0.2) !important;
+  padding: 2px 8px !important;
+  border-radius: 10px !important;
+  font-size: 11px !important;
+}
